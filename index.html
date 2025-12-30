@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Colour Tap Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    background:#0f0f0f;
+    font-family:Arial, sans-serif;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.game{
+    width:90%;
+    max-width:360px;
+    text-align:center;
+}
+
+#message{
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+.score{
+    margin-bottom:10px;
+    font-size:18px;
+}
+
+.timer{
+    height:8px;
+    background:#333;
+    border-radius:5px;
+    overflow:hidden;
+    margin-bottom:15px;
+}
+
+.timer-bar{
+    height:100%;
+    width:100%;
+    background:#00ff88;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.box{
+    height:130px;
+    border-radius:16px;
+    cursor:pointer;
+    transition:transform 0.1s;
+}
+
+.box:active{
+    transform:scale(0.92);
+}
+
+.red{background:#ff3b3b;}
+.blue{background:#3b6cff;}
+.green{background:#3bff6f;}
+.yellow{background:#ffe93b;}
+
+button{
+    margin-top:18px;
+    padding:12px 30px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+    <div id="message">Press Start</div>
+    <div class="score">Score: <span id="score">0</span></div>
+
+    <div class="timer">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div class="grid">
+        <div class="box red" data-color="red"></div>
+        <div class="box blue" data-color="blue"></div>
+        <div class="box green" data-color="green"></div>
+        <div class="box yellow" data-color="yellow"></div>
+    </div>
+
+    <button onclick="startGame()">Start Game</button>
+</div>
+
+<script>
+const colors = ["red","blue","green","yellow"];
+let targetColor="";
+let score=0;
+let playing=false;
+let time=100;
+let timerInterval;
+
+const msg=document.getElementById("message");
+const scoreTxt=document.getElementById("score");
+const timerBar=document.getElementById("timerBar");
+const boxes=document.querySelectorAll(".box");
+
+boxes.forEach(box=>{
+    box.onclick=()=>{
+        if(!playing) return;
+
+        if(box.dataset.color===targetColor){
+            score++;
+            scoreTxt.innerText=score;
+            nextRound();
+        }else{
+            gameOver();
+        }
+    };
+});
+
+function startGame(){
+    score=0;
+    scoreTxt.innerText=score;
+    countdown(3);
+}
+
+function countdown(n){
+    msg.innerText=n>0 ? n : "GO!";
+    if(n>0){
+        setTimeout(()=>countdown(n-1),700);
+    }else{
+        playing=true;
+        nextRound();
+    }
+}
+
+function nextRound(){
+    clearInterval(timerInterval);
+    time=100;
+    timerBar.style.width="100%";
+
+    targetColor=colors[Math.floor(Math.random()*4)];
+    msg.innerText="TAP "+targetColor.toUpperCase();
+
+    timerInterval=setInterval(()=>{
+        time-=2;
+        timerBar.style.width=time+"%";
+        if(time<=0){
+            gameOver();
+        }
+    },100);
+}
+
+function gameOver(){
+    playing=false;
+    clearInterval(timerInterval);
+    msg.innerText="GAME OVER";
+}
+</script>
+
+</body>
+</html>
